@@ -6,9 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-
-
-
 using System.Threading.Tasks;
 
 namespace CustomerService.Controllers
@@ -34,12 +31,13 @@ namespace CustomerService.Controllers
 
             return customer;
         }
-        
-        [HttpGet]
+
+        [HttpGet("customers")]
+
         public IEnumerable<Customer> GelAllCustomerDetails()
         {
-           return  _customerRepository.GetAllCustomers().ToArray();
-            
+            return _customerRepository.GetAllCustomers().ToArray();
+
 
         }
 
@@ -62,8 +60,8 @@ namespace CustomerService.Controllers
             _customerRepository.Add(customer);
             return Ok(customer);
         }
-            [HttpPut]
-            public async Task<ActionResult> Put([FromBody]Customer customerChanges)
+        [HttpPut]
+        public async Task<ActionResult> Put([FromBody] Customer customerChanges)
         {
 
             if (customerChanges == null)
@@ -76,7 +74,7 @@ namespace CustomerService.Controllers
             {
                 return BadRequest(ModelState);
             }
-             _customerRepository.Update(customerChanges);
+            _customerRepository.Update(customerChanges);
 
             return Ok(customerChanges);
 
@@ -89,16 +87,30 @@ namespace CustomerService.Controllers
 
             if (customer == null)
             {
-                return NotFound();
+                return NotFound("Not deleted");
             }
             else
             {
                 return Ok(customer);
             }
-           
-        }
-        
 
+        }
+
+        [HttpGet("search/{customerName}")]
+          
+        public ActionResult<List<Customer>> SearchByName(string customerName)
+        {
+         
+           if (customerName == null)
+           {
+                return NotFound("Name value is not supplied");
+           }
+            var customerList = _customerRepository.GetAllCustomers().ToList();
+                                
+            var customersByName= customerList.Where(cust => cust.CustomerName == customerName).ToList();
+            
+         return Ok(customersByName);
+        }
 
     }
 
